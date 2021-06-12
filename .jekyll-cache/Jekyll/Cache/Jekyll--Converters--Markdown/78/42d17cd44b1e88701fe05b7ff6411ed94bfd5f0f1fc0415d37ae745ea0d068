@@ -1,0 +1,174 @@
+I"�<h2 class="section-heading"># Promise?</h2>
+<p></p>
+<p>객체, 비동기 작업이 맞이할 미래의 완료 또는 실패와 그 결과값을 나타 냄</p>
+<p></p>
+<p>Promise는 객체가 생성될 때 꼭 알 수 있지는 않은 값을 위한 대리자. 비동기 연산이 끝난 이후의 결과값이나 실패 이유를 처리하기 위해 사용</p>
+<p></p>
+<p>자바스크립트 callback hell을 해결하기 위해 ECMA Script 2015(ES6)에서 도입 시작</p>
+<p></p>
+<p>!! Promise가 코드를 동기적으로 만들 수 있게 하더라도 내부적으로는 비동기 적으로 동작한다.</p>
+<p></p>
+<p>그럼 3가지 상태를 가진다고 했는데 각각 어떤 상태인가?</p>
+<p></p>
+<p>1. 대기(pending)</p>
+<p></p>
+<p>2. 이행(fulfilled)</p>
+<p></p>
+<p>3. 거부(rejected)</p>
+<p></p>
+<p>우선 대기(pending)상태는 초기 상태이며, 현재 내부 코드가 수행 중인 상태.</p>
+<p></p>
+<p>이행(fulfilled)는 내부 코드가 성공적으로 수행되었고, 연관된 결과값을 가지고 있는 상태.</p>
+<p></p>
+<p>거부(rejected)는 내부 코드 수행 중에 실패했고, 그와 관련된 오류 값을 가지고 있는 상태.</p>
+<p></p>
+<p>결국 pending상태에서 fulfilled상태 혹은 rejected상태로 넘어가게 되는데, 이렇게 넘어간 promise는 정착(settled)상태라고 불린다. 그러니까 settled 상태로 넘어간 후에 reject()를 호출 해도 상태가 계속 fulfilled 상태로 남아있는다는 이야기다. </p>
+<p></p>
+<p>⇒ resolve()혹은 reject()가 호출된 후에 다른 resolve(), reject() 호출은 영향을 미치지 못한다.</p>
+<p></p>
+<p>⇒ 이것이 async/await의 핵심, async 함수 종료 후 promise가 이행 상태에서 거부 상태로 바뀌면 어떻게 await가 동작할것이란는 것.</p>
+<p></p>
+<h2 class="section-heading"># promise 기초</h2>
+<p></p>
+<pre>
+    <code>
+let _promise = function (param) {
+	return new Promise(function (resolve, reject) {
+		window.setTimeout(function () {
+			if (param) {
+				resolve("해결 완료");
+			}
+			else {
+				reject(Error("실패!!"));
+			}
+		}, 3000);
+	});
+};
+    
+//Promise 실행
+_promise(true)
+.then(function (text) {
+	console.log(text);  //해결 완료
+}, function (error) {
+	console.error(error); // -실행 안됨-
+});
+</code>
+</pre>
+<p></p>
+<p>일단 _promise로 함수 표현식으로 선언하고, 그 안에서 new promise를 반환해주는 함수로 구성한다. 비동기로 처리하기 위해 setTimeout으로 3000ms를 설정해주고, param으로 true를 받기 때문에  3초 이후 resolve("해결 완료")로 promise가 fulfilled된다. 이 param이 false로 받게 된다면 reject()가 실행되면서 function(error) 이후가 실행될 것이다. </p>
+<p></p>
+<h2 class="section-heading"># 근데 Promise를 쓰는 방법이 하나가 아닌데?</h2>
+<p></p>
+<p>Promise를 사용하는 방식은 크게 두가지로 볼 수 있다.</p>
+<p></p>
+<p>1. new Promise(function(resolve, reject) 패턴</p>
+<p>2. Promise.resolve(function()) 패턴</p>
+<p></p>
+<pre>
+    <code>
+// 1. new Promise(function(resolve, reject))
+function async1 (param) {
+    return new Promise(function(resolve, reject) {
+        resolve(param*2);
+    });
+}
+function async2 (param) {
+    return new Promise(function(resolve, reject) {
+        resolve(param*3);
+    });
+}
+ 
+let start = 1;
+async1(start)
+    .then(async2)
+    .then(result =&gt; {
+        console.log(result); // 6
+    });
+
+</code>
+</pre>
+<pre>
+    <code>
+// 2. promise.resolve(function())
+function async1 (param) {
+    return Promise.resolve(param*2);
+}
+function async2 (param) {
+    return Promise.resolve(param*3);
+}
+ start = 1;
+async1(start)
+    .then(async2)
+    .then(result =&gt; {
+        console.log(result); // 6
+    });
+</code>
+</pre>
+
+<p>무슨 차이가 있느냐?</p>
+<p></p>
+<p>Promise 함수 안에 async 함수가 있으면 2번의 패턴에서 문제가 발생한다. Promise는 then()함수를 포함하는 thenable객체를 반환하기 때문에 then()이나 catch()로 받아서 동작을 하는데, promise에 의해 thenable 객체가 반환되지 않으면 promise종료 타이밍이 애매해진다.</p>
+<p></p>
+<p>xhr 예제로 확인해볼때, </p>
+<p></p>
+<pre>
+    <code>
+//chrome cross origin off
+function request (param) {
+    return Promise.resolve(
+        .then(function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'http://google.co.kr/', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) {
+                    return Promise.resolve(xhr.response);
+                }
+            };
+            xhr.send(null);
+        });
+}
+ 
+Promise.resolve()
+    .then(request)
+    .then(result =&gt; {
+        console.log('ok');
+        console.log(result); // undefined
+    });
+</code>
+</pre>
+
+<p>이를 1번 패턴으로 바꾸어 준다면</p>
+<pre>
+    <code>
+//chrome cross origin off
+function request (param) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://google.co.kr/', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) {
+                resolve(xhr.response);
+            }
+        };
+        xhr.send(null);
+    })
+}
+Promise.resolve()
+    .then(request)
+    .then(result =&gt; {
+        console.log('ok');
+        console.log(result); // ...google html Code...
+    });
+</code>
+</pre>
+<p></p>
+<p>이와 같이 잘 작동하는 것을 볼 수 있다.</p>
+<p></p>
+<p>이는 promise 컨텍스트의 종료 시점 차이에 의한 것으로, 1번 예제에서는 xhr.send()가 실행되면서 해당 컨텍스트의 작업이 끝나고, promise 컨텍스트도 종료되기 때문에 xhr이 완료되고 반환되는 객체를 받을 시점에는 이미 모든 컨텍스트가 종료된 후이기 때문에 받을 수가 없다.</p>
+<p></p>
+<p>하지만 2번의 예제에서는 onreadystatechange 안에서 resolve()가 실행되기 때문에 promise 실행 컨테게스트를 벗어나지 않고 결과를 얻을수 있다.</p>
+<p></p>
+<h2 class="section-heading"># 결론</h2>
+<p>비동기 프로그래밍에서 promise의 3가지 상태 개념을 알아야 async await 처리 할 때 의도하는 대로 사용할 수 있을것 같은 느낌이 든다. </p>
+<p>비동기 개념에 대해서 파면 팔수록 계속 자료가 튀어나오는데, 잎으로 포스팅할 거리는 부족할것 같지는 않다.</p>
+:ET

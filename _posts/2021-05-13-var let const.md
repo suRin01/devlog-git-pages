@@ -2,7 +2,7 @@
 layout: post
 title: "var, let, const"
 subtitle: "부제: var의 문제점"
-date: 2021-05-13 02:13:13 -0900
+date: 2021-05-13 02:13:13 +0900
 background: '/img/posts/05.jpg'
 ---
 <h2 class="section-heading">var, let, const</h2>
