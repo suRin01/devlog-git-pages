@@ -6,7 +6,7 @@ date: 2021-06-24 12:30:15 +0900
 background: '/img/posts/05.jpg'
 ---
 # Constant를 써야 하는 이유
-cons로 저장되는 데이터들은 보통 특정 리소스(이미지, URL, 서버 주소 등등)의 링크 등에 쓰기 위한 스트링이다. 
+const로 저장되는 데이터들은 보통 특정 리소스(이미지, URL, 서버 주소 등등)의 링크 등에 쓰기 위한 스트링이다. 
 이러한 것들을 코드 내에 직접적으로 입력해놓게 되면 하드코딩했다고 하면서 대차게 까이거나 하는게 대부분이다.  
 개발 진행하다가 보면 이런 주소나 위치는 계속 바뀌고 그럴때마다 그 링크가 사용된 곳을 일일히 찾아줘야 하는 문제점이 발생하기 때문이다.
 뭐 다 바꾸면 되지 그게 뭐가 문제냐? 하는 사람도 있겠지만, 막상 하나하나 바꾸다 보면 꼭 하나씩 빼먹고 안바꾸는 것들이 존재한다. 
@@ -14,7 +14,7 @@ cons로 저장되는 데이터들은 보통 특정 리소스(이미지, URL, 서
 
 
 ## json in .js
-~~~javascript
+```javascript
 //constants.js
 const  jsonVariable = {
 	aa:  "bb",
@@ -28,7 +28,7 @@ module.exports = jsonVariable;
 //use.js
 let  constant = require("./constant")
 console.log(constant.cc.dd); // expect output: ee
-~~~
+```
 json으로 .js파일에 저장하고, require나 import로 불러와서 사용하는 방식이다.
 간단하고 직관적이고 사용하기 쉽지만, 불러왔을때 객체의 값을 수정할 수 있는 문제점이 존재한다. 그 대응 방안으로 Object.freeze(Object)를 사용하여서 변수를 constant처럼 접근은 가능하지만, 값은 바꿀수 없도록 말 그대로 얼릴 수가 있다. 하지만 여기서 문제점이 발생한다.
 Object.freeze(Object)는 얕은 동결(mdn(https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze)으로서, 첫 직속 속성에만 적용되고 속성의 값이 객체라면 그 객체는 동결되지 않는다. 이는 constant에서 값의 재할당 방지를 위해서 문제가 있을 수 있게 되고, 이를 방지하는 방법을 사용하는게 좋다고 생각했다.
