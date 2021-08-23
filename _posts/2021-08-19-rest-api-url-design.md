@@ -92,7 +92,9 @@ GET    /user?page=3
 GET http://api.my.site/v1/user
 GET http://api.my.site/v2/user?member-type=admin
 ```
-예를 들어 초기 버전에서 지원하지 않던 필터 등이 버전 2에서 지원된다거나, 응답 json의 형식이 버전 2에서 달라지거나 하는 등의 변경이 있을때 버저닝을 통해서 알리는 것이 좋아 보인다.
+예를 들어 초기 버전에서 지원하지 않던 필터 등이 버전 2에서 지원된다거나, 응답 json의 형식이 버전 2에서 달라지거나 하는 등의 변경이 있을때 버저닝을 통해서 알리는 것이 좋다.
+
+
 
 
 ### 캐싱
@@ -102,3 +104,129 @@ node.js의 express 경우에는 apicache라는 미들웨어가 존재하고 많�
 
 
 ### 보안
+요청 데이터에 대한 검증은 기본적이고, 인증된 사용자에게 서비스를 제공하기 위해서 api 키와 같은 것들을 고려할 수 있을 것이다. 
+API KEY는 해싱 등의 알고리즘을 이용해서 생성하고, 시간단위, 일 단위로 재발급을 통해서 KEY가 탈취당했을 때 피해를 최소화 할 수 있다. 
+이러한 기본적인 인증을 넘어, Oauth와 같은 프레임워크와, 파생되어 나온 JWT등을 이용하여서 보안을 강화할 수 있을 것이다.
+
+
+
+
+## 로이 필딩이 말하는 REST Api
+
+### REST Api === REST 아키텍쳐를 따르는 API
+REST 는 분ㅅ나 하이퍼 시스템을 위하여 만들어진 아키텍쳐 스타일이고, 아키텍쳐 스타일이란 제약 조건의 집합이다.
+흔히 인식되는 REST API는 쉽고, 제약 조건이 적고, 단순하다는 인삭과 달리 REST 개념을 창시한 로이 필딩은 자신이 만든 REST의 개념을 잘 지키고 있는 REST 서비스가 없다며 Microsoft에서 만든 CMIS(Rest 바인딩을 지원하는 CMS 표준)의 깃 레포까지 찾아가서 NO REST in CMIS라는 말을 남기며 이렇게 바꿔달라고 풀 리퀘스트까지 남겼다.
+그러면서 REST 아키텍쳐를 따르지 않을꺼라면 REST API라는 말을 쓰지 않거나, 다른 단어를 써 달라고 까지 하는데, 이 창시자가 말하는 REST API는 뭔가??
+
+
+### REST 가 가져야 할 필수 요건들
+1. Client-Server
+2. Stateless
+3. Cache
+4. Uniform Interface
+5. Layered System
+6. Code-on-demand(optional)
+
+
+이중 필수인 1-5 까지, 4를 제외하고는 http 명세만 잘 따라도 지킬수 있는 것들이다. 하지만 4, Uniform Interface는 잘 지켜지지 않는 제약 조건이다.
+
+그럼 Uniform Interface에서 지켜야 할 세부 항목들이 뭐가 있는지도 살펴보자
+
+
+### Uniform Interface
+1. Identification of resources
+2. Manipulation of resources through representations
+3. Self-descriptive messages
+4. Hypermedia as the engine of application state(HATEOAS)
+
+1은 URI로 리소스가 식별되는것이기 때문에 대부분의 REST들이 만족하고 있고, 2는 HTTP 헤더에 GET, POST등의 메소드등을 통해서 리소스를 조작하는 것, 이것 또한 대부분의 REST API가 만족하고 있다. 
+하지만 3번, 메세지만 보고도 해석이 가능한지와 4번, 어플리케이션의 상태는 Hyperlink를 이용해 전이되어야 한다와 같은 명세는 지켜지지 않는 것이 대부분이다.
+
+이제 안지켜진다는 3번과 4번 항목에 대해서 또한 알아보자
+
+
+
+### Self-descriptive messages
+REST API가 반환하는 메세지는 스스로 설명 가능해야 한다 라는 뜻이다.
+그 단순하게 설명하자만, 반환하는 메세시 Content-type을 정의하고 같이 보내라! 라고 할 수 있겠다.
+
+``` http
+HTTP/1.1 200 OK
+
+[{"op": "remove", "path":"/a/b/c"}]
+```
+위와 같은 메세지를 API가 반환했을 때, Body에 어떤 타입의 데이터가 들어가 있는지 클라이언트에서는 알 방법이 없다. 이와 같은 메세지를 이렇게 바꿔보자.
+
+``` http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[{"op": "remove", "path":"/a/b/c"}]
+```
+위의 메시지는 Body의 데이터가 application/json 타입이라는 것을 명시하고 있다. 하지만 op가 뭔지, path가 무엇을 의미하는지는 알 방법이 없다.
+이러한 점을 보완하기 위해서
+``` http
+HTTP/1.1 200 OK
+Content-Type: application/json-patch+json
+
+[{"op": "remove", "path":"/a/b/c"}]
+```
+으로 변경하게 된다면, op가 무엇을 의미하는 것인지, path가 무엇을 의미하는지 알 수 있다.
+위 명세에 대한 것을 rfc6902에서 명세하고 있으며, 해당 [링크](https://www.rfc-editor.org/rfc/rfc6902.html)에서 그 내용을 볼 수 있다.
+
+근데 사람들이 다 rfc에서 등록된 것들을 해야 하는가? 이 점에 대해서는 IANA에서 뭐 미디어 타입을 등록할 수 있도록 폼을 열어놓긴 했는데...[링크](https://www.iana.org/form/media-types) 사실상 할 수 있을까..?
+
+그래서 Profile이라는 방법이 있다.
+자기가 op가 뭐고, path가 뭔지 정의한 명세를 작성해서, 헤더 link에 rel="profile"로서 해당 도큐를 같이 보내는 것이다.
+
+``` http
+HTTP/1.1 200 OK
+Content-type: application/json
+Link: <http://example.org/docs/operation; rel="profile">
+
+[
+    { "op": "remove", "path": "/a/b/c"}
+]
+```
+클라이언트가 Link 헤더와 profile을 이해할 수 있다면, 해당 메세지는 self-descriptive라고 할 수 있다.
+
+### HATEOAS
+data에 다양한 방법으로 하이퍼링크를 표현하면 된다.
+```
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+Link: <http://example.org/docs/todos>; rel="profile"
+{
+    "data":[{
+        "type": "todo",
+        "id"  : "1",
+        "attributes": {"title": "출근하기" },
+        "links": {"self" : "http://example.com/todos/1"}
+    },
+    {
+        "type": "todo",
+        "id"  : "2",
+        "attributes": {"title": "퇴근하기" },
+        "links": {"self" : "http://example.com/todos/2"}
+    }]
+}
+```
+
+JSON으로 하이퍼링크를 표현하는 방법을 정의한 명세들을 활용하면 되겠다.
+다른 방법으로는 HTTP 헤더로 링크를 표현할 수 있다
+``` http
+HTTP/1.1 204 No Content
+Location: /todos/1
+Link: </todos>; rel="collection"
+```
+
+결국 HATEOAS는 두가지 방법 다 적제적소에서 사용하면 된다
+
+
+
+
+## 결론
+설계된 아키텍쳐를 따라 API를 설계하고 구현하는 것에는 많은 제약조건들이 따른다
+하지만 그 명세들을 지켰을 때, 서버와 클라이언트의 독립적인 성장이 이루어질 수 있게 되고, 그 결과 버저닝에 비교적 자유로운 API를 만들수 있게 된다는 것이다.
+지금 하고 있는 프로젝트에도, 이 모든것들을 다 적용시켜서 완성시킬 수 있었으면 좋겠다.
+갈 길은 멀지만, 그래도 어떻게 하면 되지 않을까 싶다

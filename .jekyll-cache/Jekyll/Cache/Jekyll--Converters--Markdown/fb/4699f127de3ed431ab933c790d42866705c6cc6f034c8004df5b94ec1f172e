@@ -1,0 +1,161 @@
+I"�><p>\</p>
+
+<h1 id="이벤트-루프">이벤트 루프</h1>
+<p>\</p>
+<h2 id="이벤트-루프란">이벤트 루프란?</h2>
+<p>Node.js에 대한 글들을 찾아보면 자바스크립트 기반의 런타임이고, 자바스크립트는 단일 스레드 기반의 언어이지만 동시성을 가질 수 있는 언어라는 글을 심심찮게 볼 수 있다.<br />
+여기서 단일 스레드 기반이면서 어떻게 통시성이라는 개념을 가질 수 있게 되는지에 대한 의문이 남는다. 이 개념을 설명하기 위해서 등장하는 개념이 이벤트 루프이고, 항상 이벤트 루프 기반의 비동기 방식으로 논블로킹 IO를 지원한다…라는 말이 등장한다<a href="https://ko.wikipedia.org/wiki/Node.js">링크</a>. <br />
+<br />
+하지만 자바스크립트 엔진 V8 등등에서는 단일 호출 스택을 사용하여 요청이 들어올 때마다 해당 요청을 순차적으로 호출 수택에 담아 처리할 뿐인데, 이 이벤트 루프라는게 어떤 조화를 부리셔서 싱글스레드에서 동시성을 지원할 수 있게 되는지를 알아 보자.<br />
+<br />
+일단 브라우저에서는 Web APIs, callback Queue, Event Loop 등으로 구성되어 있다.\</p>
+<ol>
+  <li>Web APIs<br />
+Web APIs에서는 DOM, XMLHttpRequest, setTimeout이 있다. 각각의 역할에 대해서는 아래에서 다시 상세하게 다시 설명할 것 이다.\</li>
+  <li>Task Queue<br />
+Task Queue에는 이벤트 발생 시 실행할 callback 함수가 큐에 추가되고. 이후 이벤트 루프에 의해서 자바스크립트 엔진 내부 콜스택에 추가된다.\</li>
+  <li>Javascript Engine<br />
+자바스크립트 엔진 내 힙과 콜 스택이 있고, 콜 스택에는 요청이 들어올 때 마다 해당 요청을 순차적으로 콜 스택에 담아 처리한다.\</li>
+  <li>Event Loop<br />
+이벤트 루프에서는 콜 스택이 비었을때 테스크 큐에서 우선순위에 따라 콜백 함수를 콜 스택에 넣어주는 역할을 한다<br />
+<img src="/img/posts/21_08_17/webLogic.png" alt="웹" title="이미지" /><br />
+<a href="https://meetup.toast.com/posts/89">출처</a><br />
+<br />
+<br />
+이 구조를 비슷하게 가져가서, Node.js에서는 비동기 IO를 지원하기 위해서 libuv 라이브러리를 사용하고, 이 libuv에서 이벤트 루프를 제공한다. <br />
+<br />
+Node.js에서는 개발자가 작성한 js 코드, Node.js Api, V8 Javascript engine, libuv와 libuv를 통해서 조정되는 OS영역으로 나누어진다.<br />
+<img src="/img/posts/21_08_17/nodejsLogic.jpg" alt="웹" title="이미지" /><br />
+<a href="https://sjh836.tistory.com/149">출처</a><br />
+<br />
+위의 아키텍쳐 그림을 보면, 분명 시작할 때 nodejs는 싱글 스레드 기반이라고 했는데 개요도에는 스레드가 왤케 많냐! 라고 할 사람이 있을 것이다.<br />
+일단 그 이유는 javascript가 단일 스레드로 실행되기 때문에 싱글 스레드라고 이야기 하는것이고, 말 그대로 시분할로 두개의 javascript 코드가 동시에 실행되지 않기 때문에 싱글 스레드라고 이야기 하는 것이다. <br />
+이러한 논점에 대해서는 일단 넘어가고, 더 중요한 nodejs 안에서 코드가 어떻게 도는지, 또 어떠한 과정을 거쳐서 운용되는지 깊게 알아보도록 하자.<br />
+
+    <h2 id="libuv">libuv?</h2>
+    <p>libuv는 비동기 입출력, 이벤트 기반에 초점을 맞춘 라이브러리이다. 리눅스와 윈도우 커널의 비동기 IO 인터페이스를 추상화 시켜 IO 요청을 비동기로 실행될 수 있게 해 준다. <br />
+libuv는 윈도우의 IOCP, 리눅스의 AIO에서 어떠한 작업들이 비동기로서 처리할 수 있도록 지원하는지 알고 있기 때문에, 그러한 작업들을 받으면 커널의 비동기 함수를 호출하고 작업이 완료되면 시스템콜을 libuv에게 던져주고 libuv내에 있는 이벤트 루프에 콜백으로 등록된다. <br />
+이러한 작업들 외, CPU를 많이 사용하는 작업들(crypto, ZLib)은 libuv 내의 Worker Thread Pool의 스레드에 의해서 처리된다.<br />
+<br />
+그럼 이제 libuv에 있는 uv_io가 블로킹 되는 작업들을 비동기로 처리하기 위해서 시스템에서 처리할수 있는 건 거기서 처리하고, 그렇지 못한 애들은 스레드풀에 올려서 처리하는 역할인것을 알았다. <br />
+<br />
+이제 큼직하게 있는 저 이벤트 루프에 대해서만 이해하면, 큰 틀을 잡을 수 있을 것이다.<br />
+<br />
+\</p>
+    <h3 id="event-loop">Event Loop</h3>
+    <p>이벤트 루프는 가능하다면 시스템 커널에 작업을 전달하고, Node.js가 논블로킹 IO작업을 수행하도록 한다. 커널에서 수행한 작업이 완료되면 커널이 Node.js에게 알려주고, 적절한 콜백을 poll 큐에 추가하여 최종적으로 완료된다.<br />
+이벤트 루프는 몇개의 phase들로 구성되어 있고, 각 phase들은 FIFO 큐를 가지고 있으며 이 큐에 특정 이벤트들의 콜백을 넣고 CPU가 할당될 때 실행한다(앞서 설명한 poll 큐와 같은 큐들).<br />
+Node.js가 시작되면 이벤트 루프를 초기화하고, 작성된 스트립트를 처리한다. 이때 이 스크립트가 비동기 API를 호출하거나, 스케쥴링 된 타이머를 사용하거나 process.nextTick()을 호출 할 경우 이벤트 루프 처리를 시작하게 된다.<br />
+<br />
+아래 다이어그램에서 이벤트 루프 처리의 간단한 개요를 볼 수 있다.<br />
+\</p>
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>┌───────────────────────────┐
+┌─&gt;│           timers          │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │     pending callbacks     │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │       idle, prepare       │
+│  └─────────────┬─────────────┘      ┌───────────────┐
+│  ┌─────────────┴─────────────┐      │   incoming:   │
+│  │           poll            │&lt;─────┤  connections, │
+│  └─────────────┬─────────────┘      │   data, etc.  │
+│  ┌─────────────┴─────────────┐      └───────────────┘
+│  │           check           │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+└──┤      close callbacks      │
+└───────────────────────────┘
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p><a href="https://nodejs.org/ko/docs/guides/event-loop-timers-and-nexttick/">출처</a><br />
+<br />
+각 박스는 이벤트 루프의 페이즈를 의미하고, 각 단계는 실행할 콜백의 FIFO 큐를 가진다. 각 페이즈는 페이즈마다의 방법에 제한적이므로 보통 이벤트 루프가 해당 페이즈에 진입하면 해당 페이즈에 한정된 작업을 수행하고 큐를 모두 소진하거나, 콜백의 최대 갯수를 실행할 때 까지 해당 단계의 큐에서 콜백을 실행한다. 큐를 모두 소진하거나 콜백 제한에 이르면 이벤트 루프는 다음 페이즈로 이동한다.<br />
+<br />
+이러한 작업이 또 다른 작업을 스케쥴링 하거나 poll단계에서 처리된 새로운 이벤트가 커널에 의해 큐에 추가될 수 있으므로 풀링 이벤트를 처리하면서 poll이벤트를 큐에 추가 할 수 있다. <br />
+<br />
+다음으로는 각 페이즈에 대해서 간략하게 알아보자<br />
+\</p>
+<ol>
+  <li>Timer Phase<br />
+타이머 페이즈는 이벤트 루프의 시작을 알리는 페이즈이다. 이 페이즈가 가지고 있는 큐에는 setTimeout이나 setInterval같은 타이머들의 콜백을 젖아하게 된다. 이 페이즈에서 바로 타이머들의 콜백이 큐에 들어가는 것은 아니지만, 타이머들을 min-heap으로 유지하고 있다가 실행할 때가 된 타이머들을 콜백을 큐에 넣고 실행하는 것이다.<br />
+\</li>
+  <li>Pending callback Phase<br />
+이 페이즈에서 이벤트 루프의 pending_queue에 있는 콜백들을 실행한다. 클로즈 콜백, 타이머로 스케쥴링된 콜백, setImmediate()를 제외한 거의 모든 콜백들이 여기로 모인다. <br />
+\</li>
+  <li>idle, prepare<br />
+내부용으로 사용된다. idlev 페이즈는 매 틱마다 실행되게 되고, prepare 페이즈는 매 폴링마다 실행된다. 모든 큐가 비어있으면 idle에서 tick frequency가 떨어지고, 이벤트 루프가 천천히 돌게 된다.<br />
+이 두 페이즈는 이벤트 루프와 직접적인 연관 보다는, 내부적인 관리를 위해서 사용된다.<br />
+\</li>
+  <li>poll Phase<br />
+이벤트 루프가 uv_io_poll()을 호출했을 때 poll 큐에 있는 이벤트, 콜백들을 처리한다. 가장 중요한 페이즈라고 할 수 있다. CPU를 할당 받았을때 poll큐가 비어있다면 setImmedate()가 있으면 check 페이즈로 넘어가고, 없으면 이벤트가 phase를 무한히 돌며 콜백을 기다린다. poll 큐에 뭔가 있다면 이벤트루프가 큐를 순회하며 처리하게 된다.<br />
+\</li>
+  <li>check<br />
+setImmediate()콜백이 여기서 호출되고 처리된다<br />
+\</li>
+  <li>close<br />
+socket.co(“close”, …)같은 것들이 여기서 처리된다.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+또, 이 페이즈마다 붙은 큐와 함께 nextTickQueue와 microTaskQueue와 같은 큐가 있다.<br />
+nextTickQueue는 process.nextTick()의 콜백들을 가지고 있고, mircoTaskQueue는 resolve된 promise들의 콜백을 가지고 있다. <br />
+이 두개의 큐는 기술적으로는 이벤트 루프의 일부가 아니고, Node.js에 포함된 큐이며 이 큐가 가지고 있는 작업들은 libuv의 큐에서 가지고 있는 작업들보다 우선된다. 또, nextTickQueue는 mircoTaskQueue보다 높은 우선순위를 가지고 있다.<br />
+<br />
+<br />
+
+    <h3 id="이벤트-루프의-작업-흐름">이벤트 루프의 작업 흐름</h3>
+    <p><br />
+node 명령어를 통해서 스크립트를 실행하면 Node.js는 이벤트 루프를 생성한 다음 이벤트 루프 바깥에서 메인 모듈을 실행한다. 한번 메인 모듈이 실행되고 나면 Node.js는 이벤트 루프가 활성 상태인지, 즉 이벤트 루프 안에서 해야 할 작업이 있는지 확인한다. 그리고 이벤트 루프를 돌릴 필요가 없다면 Node.js는 process.on(“excit”, ()=&gt;{})를 실행하고 이벤트 루프를 종료시킨다<br />
+<br />
+이벤트 루프가 필요한 상황이라면 Node.js는 이벤트 루프의 첫 페이즈인 Timer 페이즈를 실행시킨다.<br />
+\</p>
+  </li>
+  <li>Timer phase<br />
+이벤트 루프가 타이머 페이즈에 들어가면 실행할 타이머 콜백 큐에 뭔가 있는지 확인하게 된다. 이 작업은  힙 상에 오른차순으로 저장된 타이머들을 하나씩 가져와서 타이머의 콜백을 실행할 시간이 되었는지 검사한다.<br />
+해당 조건에 부합되면 이 타이머의 콜백을 실행하고, 다음 타이머를 확인한다. 또한 오름차순으로 정렬되어 있기 때문에, 해당되지 않는 타이머를 만난다면 탐색을 종료하고 다음 페이즈로 넘어가게 된다. 또, 각 페이즈는 시스템의 실행 한도에 영향을 받고 있기 때문에 실행 되어야하는 타이머가 남아 있다 하더라도 실행 한도에 도달하면 바로 다음 페이즈로 이동한다. 이 때문에 setTimeout에서 10ms로 지정한다고 하더도 정확히 10ms때에 실행되지 않는 이유이기도 하다.<br />
+<br />
+\</li>
+  <li>Pending IO Phase<br />
+팬딩 IO 페이즈에 진입하게 되면, 이전 작업들의 콜백이 실행 대기중인지 확인한다. Pending Queue에 작업이 남아있는지 확인하고, 실행 대기 중이라면 큐가 비거나 시스템 실행 한도에 도달할때까지 대기하고 있던 콜백들을 실행한다. 이 과정이 종료되면 Idle 페이즈와 Prepare 페이즈를 거쳐 Poll 페이즈로 이동한다<br />
+<br />
+\</li>
+  <li>Poll Phase<br />
+말 그대로 폴링하는 페이즈이다.<br />
+폴링이란 하나의 장치(또는 프로그램)가 충돌 회피 또는 동기화 처리 등의 목적으로 다른 장치(또는 프로그램)의 상태를 주기적으로 검사하여 일정한 조건을 만족할 때 송수신 등의 자료처리를 하는 방식을 말한다<a href="https://ko.wikipedia.org/wiki/%ED%8F%B4%EB%A7%81_(%EC%BB%B4%ED%93%A8%ED%84%B0_%EA%B3%BC%ED%95%99)">링크</a>. <br />
+아무튼 이벤트 루프가 Poll 페이즈에 들어왔을때 watcher_queue 수행해야 할 작업들이 있다면 이 작업들을 실행하게 된다. 만약 큐가 비거나, 시스템 실행 한도에 도달했을때 check_queue, pending_queue, closing_callback_queue에 해야 할 작업이 있는지 검사하고, 만약 해야 할 작업이 있다면 poll 페이즈를 종료하고 check 페이즈로 넘어간다. 만약 큐들이 비었다면, poll 페이즈는 다음 페이즈로 넘어가지 않고 타이머 힙에서 첫번째 타이머를 꺼내 본 다음 해당 타이머가 실행 가능한 상태라면 그 타이머의 딜레이 시간만큼만 대기 시간을 결정하고 대기하게 된다.<br />
+\</li>
+  <li>Check Phase<br />
+이 페이즈세서는 setImmediate()의 콜백들을 다 실행시키거나, 시스템 실행 한도에 도달할 때까지 계속 콜백들을 실행시킨다.<br />
+\</li>
+  <li>Close Phase<br />
+이 페이즈에서는 Close나 destory 콜백 타입들을 관리한다. 이벤트 루프가 Close callback과 함께 종료되고 나면 이벤트 루프는 다음에 돌아야 할 루프가 있는지 다시 체크하게 된다. 만약 아니라면 이벤트 루프는 그대로 종료된다. 하지만 아직 작업들이 남았다면 이벤트 루프는 다시 타이머 페이즈부터 시작하게 된다.<br />
+<br />
+<br />
+<br />
+
+    <h2 id="결론">결론</h2>
+    <p>이벤트 루프에 관한 글을 적다 보니 길이 길어졌다. 그래도 어떠한 방식으로 이벤트 루프가 돌아가는지 어느정도 이해가 된 것 같다. 그냥 죽 읽어볼 때는 이게 뭔 개소리지 싶다가도 정리하면서 보니까 하나씩 뭔 소리인지 뇌에 박히는것 같기도 하고…<br />
+<br />
+아무튼 새로운 사실들이 너무 많이 뇌에 박혀버렸다. 글 쓰고나서 다시 좀 더 읽어봐야지…<br />
+<br />
+<br />
+<br />
+<br />
+\</p>
+  </li>
+</ol>
+
+<h3 id="참고한-글들">참고한 글들</h3>
+<p><a href="https://sjh836.tistory.com/149">https://sjh836.tistory.com/149</a>
+<a href="https://sjh836.tistory.com/99">https://sjh836.tistory.com/99</a>
+<a href="https://leejongchan.tistory.com/22">https://leejongchan.tistory.com/22</a>
+<a href="https://stackoverflow.com/questions/48241234why-is-node-js-called-single-threaded-when-it-maintains-threads-in-thread-pool">https://stackoverflow.com/questions/48241234why-is-node-js-called-single-threaded-when-it-maintains-threads-in-thread-pool</a>
+<a href="https://betterprogramming.pub/is-node-js-really-single-threaded-7ea59bcc8d64">https://betterprogramming.pub/is-node-js-really-single-threaded-7ea59bcc8d64</a></p>
+
+:ET

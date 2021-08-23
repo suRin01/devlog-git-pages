@@ -1,0 +1,10 @@
+I"S<h1 id="mvc-mvp-mvvc">MVC, MVP, MVVC???</h1>
+<p>일단 이 세 가지에 대해서 설명하기 전에, 이 패턴들이 왜 나왔는지 부터 짚고 넘어가자.
+디자인 패턴이란 작업 공간에서 각 계층을 분리시킴으로 코드의 재활용성을 높이고 불필요한 중복을 막기 위해서 도입되었다. 이때 가장 많이 사용되는 패턴이 이 MVC, MVP, MVVM 패턴이고 이는 각</p>
+<ol>
+  <li>MVC =&gt; Model - View - Controller</li>
+  <li>MVP =&gt; Model - View - Presenter</li>
+  <li>MVVM =&gt; Model = View = ViewModel
+로 구성된다.</li>
+</ol>
+:ET

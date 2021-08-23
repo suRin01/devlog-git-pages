@@ -1,0 +1,102 @@
+I"-4<h1 id="array가-가지고-있는-메소드들-정리">Array가 가지고 있는 메소드들 정리</h1>
+
+<h2 id="push">push</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">bb</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">];</span>
+<span class="kd">const</span> <span class="nx">count</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="dl">"</span><span class="s2">dd</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">)</span> <span class="c1">// [aa, bb, cc, dd]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="c1">// 4</span>
+</code></pre></div></div>
+
+<h2 id="concat">concat</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr1</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">bb</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">];</span>
+<span class="kd">const</span> <span class="nx">arr2</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">dd</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">ee</span><span class="dl">"</span><span class="p">];</span>
+<span class="kd">const</span> <span class="nx">arr3</span> <span class="o">=</span> <span class="nx">arr1</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">arr2</span><span class="p">);</span>
+
+<span class="nx">cosole</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr3</span><span class="p">);</span> <span class="c1">// ["aa", "bb", "cc", "cc", "dd", "ee"];</span>
+</code></pre></div></div>
+
+<h2 id="copywithin">copyWithin</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr1</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">bb</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">dd</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">ee</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">ff</span><span class="dl">"</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr1</span><span class="p">.</span><span class="nx">copyWithin</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">));</span>
+<span class="c1">// copy array index 2 to before index 4 =&gt; ["cc", "dd"]</span>
+<span class="c1">// paste copied array to index 0 =&gt; ["cc", "dd", "cc", "dd", "ee", "ff"]</span>
+<span class="c1">// expected output: ["cc", "dd", "cc", "dd", "ee", "ff"]</span>
+
+<span class="kd">const</span> <span class="nx">arr2</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">bb</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">dd</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">ee</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">ff</span><span class="dl">"</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr2</span><span class="p">.</span><span class="nx">copyWithin</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="c1">// copy array index 3 to end =&gt; ["dd", "ee", "ff"]</span>
+<span class="c1">// paste copied array to index 0 =&gt; ["dd", "ee", "ff", "dd", "ee", "ff"]</span>
+<span class="c1">// expected output: ["dd", "ee", "ff", "dd", "ee", "ff"]</span>
+</code></pre></div></div>
+
+<h2 id="entries">entries</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">];</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">index</span><span class="p">,</span> <span class="nx">element</span><span class="p">]</span> <span class="k">of</span> <span class="nx">a</span><span class="p">.</span><span class="nx">entries</span><span class="p">())</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">element</span><span class="p">);</span>
+
+<span class="c1">// 0 'a'</span>
+<span class="c1">// 1 'b'</span>
+<span class="c1">// 2 'c'</span>
+</code></pre></div></div>
+
+<h2 id="fill">fill</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">];</span>
+<span class="c1">//0으로 index 2부터 4까지 채우기</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">array1</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">));</span>
+<span class="c1">// expected output: [1, 2, 0, 0]</span>
+
+<span class="c1">// 5로 인덱스 1부터 끝까지 채우기</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">array1</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+<span class="c1">// expected output: [1, 5, 5, 5]</span>
+
+<span class="c1">// 전체를 6으로 채우기</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">array1</span><span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="mi">6</span><span class="p">));</span>
+<span class="c1">// expected output: [6, 6, 6, 6]</span>
+
+<span class="c1">// 객체를 할당시 객체 참조</span>
+<span class="kd">let</span> <span class="nx">arr</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">(</span><span class="mi">3</span><span class="p">).</span><span class="nx">fill</span><span class="p">({});</span>
+<span class="nx">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">test</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">testString</span><span class="dl">"</span><span class="p">;</span>
+<span class="c1">// =&gt; [{test:"testString"},{test:"testString"},{test:"testString"}]</span>
+</code></pre></div></div>
+
+<h2 id="filter">filter</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">words</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">spray</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">limit</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">elite</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">exuberant</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">destruction</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">present</span><span class="dl">'</span><span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">words</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">word</span> <span class="o">=&gt;</span> <span class="nx">word</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<span class="c1">// expected output: Array ["exuberant", "destruction", "present"]</span>
+
+</code></pre></div></div>
+
+<h2 id="find">find</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">44</span><span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">found</span> <span class="o">=</span> <span class="nx">array1</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">element</span> <span class="o">=&gt;</span> <span class="nx">element</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">found</span><span class="p">);</span>
+<span class="c1">// expected output: 12</span>
+
+</code></pre></div></div>
+
+<h2 id="findindex">findIndex</h2>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">44</span><span class="p">];</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">array1</span><span class="p">.</span><span class="nx">findIndex</span><span class="p">((</span><span class="nx">element</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">element</span> <span class="o">&gt;</span> <span class="mi">13</span><span class="p">));</span>
+<span class="c1">// expected output: 3</span>
+
+</code></pre></div></div>
+
+<p>##</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<p>##</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<p>##</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+:ET

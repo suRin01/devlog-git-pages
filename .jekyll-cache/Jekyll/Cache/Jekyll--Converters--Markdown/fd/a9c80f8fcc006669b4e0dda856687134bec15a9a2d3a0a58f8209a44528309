@@ -1,0 +1,100 @@
+I",<h1 id="단순-객체-복사와-shallow-copy와-deep-copy">단순 객체 복사와 shallow copy와 deep copy</h1>
+
+<h2 id="단순-객체-복사">단순 객체 복사</h2>
+<p>Javascript에서 객체를 연산자로 대입하게 되면, 대입 연산자는 원본 객체의 주소를 할당시킨다. 결국 대입된 객체와 원본 객체 모두 하나의 주소를 가르키고 있기 때문에, 어느 변수를 통해 접근하든 같은 객체를 건들고 있는 것과 같다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">case1</span> <span class="o">=</span> <span class="p">{</span><span class="na">a</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="na">c</span><span class="p">:</span> <span class="p">{</span><span class="na">d</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="na">e</span><span class="p">:</span><span class="mi">40</span><span class="p">}};</span>
+<span class="kd">let</span> <span class="nx">case2</span> <span class="o">=</span> <span class="nx">case1</span><span class="p">;</span> <span class="c1">// 단순 객체 복사</span>
+<span class="nx">case2</span><span class="p">.</span><span class="nx">c</span><span class="p">.</span><span class="nx">d</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">case1</span><span class="p">.</span><span class="nx">c</span><span class="p">.</span><span class="nx">d</span><span class="p">);</span> <span class="c1">// expected output: 100</span>
+
+</code></pre></div></div>
+<p>와 같이 된다.
+이는 위에서 말한 것 처럼, case1과 case2 모두 하나의 주소를 가르키고 있다.</p>
+
+<h2 id="shallow-copy얕은-복사">shallow copy(얕은 복사)</h2>
+<p>Object의 assign 메소드를 이용하여 복사를 할 때, 복사되는 원본 객체 첫 depth의 복사가능한 모든 프로퍼티를 복사한다. 그런데 이 방법을 통해서 객체 복사를 진행하게 될 때, 발생되는 문제점이 몇 가지가 있다. 이 점들을 예제를 통해서 볼 때에,</p>
+
+<h3 id="property-descriptors-복사-불가">Property Descriptors 복사 불가</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">case1</span> <span class="o">=</span> <span class="p">{</span><span class="na">a</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="na">c</span><span class="p">:</span> <span class="p">{</span><span class="na">d</span><span class="p">:</span><span class="mi">30</span><span class="p">,</span> <span class="na">e</span><span class="p">:</span><span class="mi">40</span><span class="p">}};</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">case1</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="p">{</span><span class="na">writable</span><span class="p">:</span> <span class="kc">false</span><span class="p">});</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">getOwnPropertyDescriptor</span><span class="p">(</span><span class="nx">case1</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">);</span>
+<span class="c1">// {value: 10, writable: false, enumerable: true, configurable: true}</span>
+
+<span class="kd">let</span> <span class="nx">case2</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">case1</span><span class="p">);</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">getOwnPropertyDescriptor</span><span class="p">(</span><span class="nx">case2</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">);</span>
+<span class="c1">// {value: 10, writable: true, enumerable: true, configurable: true}</span>
+
+</code></pre></div></div>
+<p>위의 예제에서 assign()을 통해서 복사된 객체는 descriptor는 복사되지 않음을 볼 수 있다.</p>
+
+<h3 id="prototype-chain이나-열겨가능한-프로퍼티">Prototype Chain이나 열겨가능한 프로퍼티</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">protoObject</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">a</span> <span class="p">:</span> <span class="mi">10</span>
+<span class="p">}</span>
+<span class="kd">let</span> <span class="nx">case1</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">protoObject</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">b</span><span class="p">:{</span>
+        <span class="na">value</span><span class="p">:</span> <span class="mi">20</span>
+        <span class="c1">//enumerable-&gt; default : false</span>
+    <span class="p">},</span>
+    <span class="na">c</span><span class="p">:{</span>
+        <span class="na">value</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="na">enumerable</span><span class="p">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">let</span> <span class="nx">case2</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">case1</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">case2</span><span class="p">);</span> <span class="c1">// {c:30}</span>
+</code></pre></div></div>
+<p>Object.create로 생성한 객체에서 프로퍼티의 기본 열거 가능은 불가로 설정되어 있고, 이렇게 생성한 객체를 assign으로 얕은 복사를 통해 복사할때 enumerable을 true로 설정하지 않을 경우 복사되지 않는다. 또한, case2의 __proto__는 case1의 __proto__가 {a:10}으로 되어이있는 반면, Object에 바로 연결 되어 있다. 프로토타입 체인까지 복사되지 않는다는 것이다.</p>
+
+<p>이러한 문제점들을 해결하기 위해서 우리는 deep copy, 깊은 복사를 통해서 복사를 진행하게 되는데 깊은 복사는 얕은 복사에서 주소를 복사하는 것 처럼 복사를 진행하는게 아니라 새로운 메모리 공간을 확보하고 그곳에 데이터를 복사하게 된다.</p>
+
+<p>javascript에서 진행할 수 있는 방법으로는</p>
+<ol>
+  <li>재귀를 통한 복사</li>
+  <li>JSON라이브러리를 통한 복사</li>
+  <li>타 라이브러리(jQuery, lodash)등을 이용한 복사</li>
+</ol>
+
+<p>가 있다. 
+이 중 첫 재귀를 통한 복사로서</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">deepCopy</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">obj</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">||</span> <span class="k">typeof</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">object</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
+  <span class="p">}</span>
+    
+  <span class="kd">let</span> <span class="nx">copy</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">copy</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">deepCopy</span><span class="p">(</span><span class="nx">obj</span><span class="p">[</span><span class="nx">key</span><span class="p">]);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">copy</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>와 같은 함수를 만들어서 사용할 수 있겠고,</p>
+
+<p>JSON 라이브러리를 통한 복사는</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kd">let</span> <span class="nx">copy</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">origin</span><span class="p">));</span>
+
+</code></pre></div></div>
+<p>와 같은 방법으로 진행할 수 있다.</p>
+
+<p>타 라이브러리를 사용할 때에는</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">// jQuery</span>
+<span class="kd">let</span> <span class="nx">copy1</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">origin</span><span class="p">);</span>
+<span class="c1">// lodash</span>
+<span class="kd">let</span> <span class="nx">copy2</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">cloneDeep</span><span class="p">(</span><span class="nx">origin</span><span class="p">);</span>
+
+</code></pre></div></div>
+<p>의 방법으로 사용하면 되겠다.</p>
+
+<p>하지만 1의 방법이나 3의 방법에 비해서, 2의 방법은 성능 차이가 있으니(약 10배 이상) 가급적 1의 방법이나 3의 방법을 사용하기를 권한다.</p>
+
+<h1 id="결론">결론</h1>
+<p>JS에서 원시 타입을 제외한 모든 것들은 객체이기 때문에 복사를 할 때에는 조심해야 한다는 생각이 들었다. 잘못 복사하다가 진짜 서로 데이터 다 얽혀서 망하는 꼴을 보고 싶지 않다면 말이다.
+근데 이정도면 Object에서 메소드로 deepCopy를 넣어줄 만도 한데 왜 안넣어주는거지…?</p>
+:ET
