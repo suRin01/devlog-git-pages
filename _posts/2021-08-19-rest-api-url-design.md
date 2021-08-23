@@ -2,7 +2,7 @@
 layout: post
 title: "REST api URL 디자인"
 subtitle: "패턴화 가이드라인들"
-date: 2021-08-22 12:30:15 +0900
+date: 2021-08-19 12:30:15 +0900
 background: '/img/posts/05.jpg'
 ---
 

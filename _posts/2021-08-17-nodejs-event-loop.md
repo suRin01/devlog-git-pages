@@ -2,7 +2,7 @@
 layout: post
 title: "Nodejs의 이벤트 루프"
 subtitle: "이벤트 루프 개념잡기"
-date: 2021-08-18 12:30:15 +0900
+date: 2021-08-23 22:30:15 +0900
 background: '/img/posts/05.jpg'
 ---
 
