@@ -144,9 +144,9 @@ findOne(@Param() params): string {
 
 
 ### Request Payload
-@Body()데코레이터를 사용하기 전에 DTO 스키마를 결정해야 한다. DTO는 데이터가 네트워크를 통해 전송되는 방식을 정의하는 객체로, Typescript 인터페이스를 사용하거나 간단한 클래스를 사용하여 DTO 스키마를 확인할 수 있따. 하지만 여기서는 클래스를 사용하는게 좋은데, 클래스는 ES6표준의 일부이기 때문에 컴파일된 자바스크립트에서 실제 엔티티로 유지되고 인터페이스는 제거되기 때문에 Nest가 런타임 중에 이를 참조할 수 없다. 
+@Body()데코레이터를 사용하기 전에 DTO 스키마를 결정해야 한다. DTO는 데이터가 네트워크를 통해 전송되는 방식을 정의하는 객체로, typescript 인터페이스를 사용하거나 간단한 클래스를 사용하여 DTO 스키마를 확인할 수 있따. 하지만 여기서는 클래스를 사용하는게 좋은데, 클래스는 ES6표준의 일부이기 때문에 컴파일된 자바스크립트에서 실제 엔티티로 유지되고 인터페이스는 제거되기 때문에 Nest가 런타임 중에 이를 참조할 수 없다. 
 
-``` Typescript
+``` typescript
 export class CreateCatDto {
   name: string;
   age: number;
@@ -165,7 +165,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 컨트롤러 정의 후에 Nest가 CatsController가 존재하는지 알지 못하므로, 결과적으로 이 클래스의 인스턴스를 생성하지 않는다.
 컨트롤러는 항상 모듈에 속하므로 @Module()데코레이터 내 controllers배열에 추가함으로서 모듈 클래스에 메타데이터를 첨부하였고, Nest이제 어떤 컨트롤러를 마운트해야하는지 반영할 수 있다.
 
-``` Typescript
+``` typescript
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 
@@ -180,7 +180,7 @@ export class AppModule {}
 
 ## 프로바이더
 
-``` Typescript
+``` typescript
 // cats.service.ts
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
@@ -198,7 +198,7 @@ export class CatsService {
   }
 }
 ```
-``` Typescript
+``` typescript
 // interfaces/cat.interface.ts
 export interface Cat {
   name: string;
@@ -682,4 +682,7 @@ async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
+
+## Guards
+이전 Node.js에서는 인증을 주로 미들웨어를 통해 처리해 왔다. 하지만 미들웨어를 통한 인증 처리는 실행 컨텍스트를 모르기 때문에 멍청할 수 밖에 없다(Next()이후 어떤 핸들러가 실행될지를 모른다). Guard를 사용해 인증을 처리하게 되면 실행 컨텍스트에 접근하여 현재 컨텍스트를 알 수 있고 요청-응답 사이클의 정확한 지점에 처리 로직을 삽입하고 선언적으로 수행할 수 있다. 이것은 코드를 DRY하고 선언적으로 유지할 수 있도록 돕는다.
 
