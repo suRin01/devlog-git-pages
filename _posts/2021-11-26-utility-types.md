@@ -2,7 +2,7 @@
 layout: post
 title: "Record<string, any>"
 subtitle: "뭔데 이게"
-date: 2021-10-10 12:30:15 +0900
+date: 2021-11-26 12:30:15 +0900
 background: '/img/posts/05.jpg'
 ---
 
