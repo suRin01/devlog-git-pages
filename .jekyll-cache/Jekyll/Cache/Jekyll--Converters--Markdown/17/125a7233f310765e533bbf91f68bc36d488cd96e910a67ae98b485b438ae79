@@ -1,0 +1,111 @@
+I"�.<h1 id="들어가기-앞서">들어가기 앞서</h1>
+<h2 id="di">DI?</h2>
+<p>DI, Dependency Injection이란 코드에서 발생하는 의존성을 해결하고, 강한 연결을 지양하기 위해서 사용되는 방법이다.</p>
+
+<p>이 문서에서 예제로 사용되는 코드들은 대부분 해당 <a href="https://angular.io/guide/dependency-injection">링크</a>에서 발최하고, Nest환경에 맞춰서 변경되었다.</p>
+
+<p>아래의 코드에 샘플로 만든 서비스가 있다.</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@angular/core</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HEROES</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./mock-heroes</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HerosService</span> <span class="p">{</span>
+  <span class="nx">findAll</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HEROES</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>이제 이 서비스를 가지고 와서, 컨트롤러에 등록을 한 후 사용하는 과정을 거치게 된다.</p>
+
+<p>의존성 주입을 활용하지 않느나면, 다음과 같은 코드가 될 것이다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">HerosService</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./hero.service.ts</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">heros</span><span class="dl">'</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HerosController</span><span class="p">{</span>
+	<span class="k">private</span> <span class="nx">heroService</span><span class="p">:</span> <span class="nx">HerosService</span><span class="p">;</span>
+	<span class="kd">constructor</span><span class="p">(){</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">herosService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HeroService</span><span class="p">();</span>
+	<span class="p">}</span>
+
+	<span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+	<span class="nx">findAll</span><span class="p">():</span> <span class="kr">string</span><span class="p">[]{</span>
+		<span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">herosService</span><span class="p">.</span><span class="nx">findAll</span><span class="p">();</span>
+	<span class="p">}</span>
+
+	<span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>이 경우에서, 컨트롤러에는 서비스 클래스에 의존성을 가진다 라고 한다.
+이와 같은 코드를 설계하였을 때, 코드의 재활용성이 떨어지고, HeroService가 수정되었을 때 HeroController클래스도 함께 수정해야 한다.</p>
+
+<p>이렇게 결합도가 높아지면 생기는 문제점에 대해서 간단하게 알아보았고, Nest에서 DI를 어떻게 진행하고 어떠한 장점이 있는지에 대해서 알아보자</p>
+
+<p>우선, 가장 권장되는 방식은 생성자 이용 의존성 주입 방식이다.
+컨트롤러와 서비스 코드 둘 다 조금씩만 만저보자</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HEROES</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./mock-heroes</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HerosService</span> <span class="p">{</span>
+  <span class="nx">findAll</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HEROES</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HeroService</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./heros.service.ts</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">heros</span><span class="dl">'</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HerosController</span><span class="p">{</span>
+	<span class="k">private</span> <span class="nx">herosService</span><span class="p">:</span> <span class="nx">HeroService</span><span class="p">;</span>
+	<span class="kd">constructor</span><span class="p">(){</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">herosService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HeroService</span><span class="p">();</span>
+	<span class="p">}</span>
+
+	<span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+	<span class="nx">findAll</span><span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="kr">string</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">{</span>
+		<span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">herosService</span><span class="p">.</span><span class="nx">findAll</span><span class="p">();</span>
+	<span class="p">}</span>
+
+	<span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>이렇게 생성자를 통해서 간단하게 의존성 주입을 할 수 있다.
+물론 이것으로 끝나는게 아니라, Nest에서는 IoC(Inversion of Control, 제어 역전) 컨테이너라는 것이 존재한다. IoC에 대한 설멍은 아래에 가서 하고, 우선 이 컨테이너에 이 의존성 주입을 등록하는 것 보자.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HerosController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./heros/heros.controller</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HerosService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./heros/heros.service</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">HerosController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">HerosService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+
+</code></pre></div></div>
+
+<p>이제 전체적으로 어떤 일들이 수행되고 있는지 알아보자.</p>
+
+<ol>
+  <li>heros.service.ts에서 @Injectable()데코레이터는 HeroService클래스를 Nest IoC컨테이너에서 관리할 수 있는 클래스로 선언하게 된다.</li>
+  <li>heros.controller.ts에서 HeroController는 생성자 주입으로 HeroService토큰에 대한 종속성을 선언한다.</li>
+  <li>이제 app.module.ts에서 HerosService토큰을 heros.service.ts파일의 HerosService클래스와 연관시킨다. 이 연결을 _registration_이라고도 한다.</li>
+</ol>
+
+<p>IoC컨테이너가 HeroController를 인스턴스화 할 때 먼저 종속성을 찾게 된다.
+HerosService 종속성을 찾으면,  이제 HerosService를 반환하는 클래스를 찾게 되고, 기본적으로 싱글톤 범위 내에 있는 HerosService 인스턴스를 생성하거나, 혹은 이미 생성되어있는 인스턴스를 반환하게 된다.</p>
+
+<h3 id="나름대로의-결론">나름대로의 결론</h3>
+<p>일단 Nest는 기본적으로 싱글톤 범위에서 매 프로바이더가 생성되고 유지된다. 모든 프로바이더의 인스턴스가 처음 부트스트랩때 생성되고(기본 싱글톤 스코프로 설정 되어 있을 경우, 이 또한 옵션으로 변경할 수 있다.) 어떠한 인스턴스가 다른 인스턴스에 종속성을 가지고 필요로 하는지를 모듈에 등록해 놓았기 때문에 필요한 경우 가져다가 쓰거나, 혹은 생성해서 사용하고 가비지 콜렉터로 넘겨주는지를 판단할 수 있게 되는 것이다.</p>
+
+<p>이 점에서 우리는 라이브러리와 프레임워크의 차이점에 대해서 알 수 있다.
+라이브러리는 우리가 필요한 코드를 가져와서 쓸 수 있는, 우리가 코드의 소비자가 되는 형태인데에 반해 프레임워크는 우리가 생성해 놓은 코드를 가져가서 쓸 수 있는, 즉 코드의 소비 주체가 될 수 있다는 점이 차이점이 되겠다.</p>
+
+<p>이러한 관점에서 보았을때 우리는 Nest로 구성된 웹 서버에서 데이터가 어떻게 처리되는지에 대해서 서술하는 입장이 되고 프레임워크는 그 코드를 라이브러리처럼 가져다가 사용하는 것이 된다.
+하지만 우리가 작성한 일종의 “라이브러리”를 프레임워크가 어떻게 사용하는지를 스스로 판단할 수 없기 때문에, 데코레이션(어노테이션)이나 module에 등록을 하면서 이럴때 이러한 코드를 사용하면 된다고 알려주는 형태가 되는 것이다.</p>
+
+<p>처음에 데코레이션과 모듈의 필요성이 express나 typescript로 작성된 node에서는 필요가 없었기 때문에 잘 체감되지 않았었는데, 라이브러리와 프레임워크의 차이점에 대해서 알고 나니까 이 둘의 필요성이 이해가 되기 시작했다.</p>
+
+<p>또한 이전 프로젝트에서 의존성 주입에 대해서 신경쓰지 않고 프로젝트를 진행했는데, 다시 와서 보니까 작은 프로젝트여서 어떻게 끝마쳤지 조금만 불어나기 시작하면 이런 것들도 챙겨야 겠다는 생각이 든다.</p>
+:ET

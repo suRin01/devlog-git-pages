@@ -1,0 +1,176 @@
+I"�-<h1 id="flex란">Flex란?</h1>
+<p><img src="/img/posts/22_01_02/flex.jpg" alt="flex" /></p>
+
+<p>이거 말고(…)</p>
+
+<p><img src="/img/posts/22_01_02/flex-warp.jpg" alt="flex" /></p>
+
+<p>이겁니다 이거</p>
+
+<p>아무튼 맨날 div로 작업할 때 flaot: left; 만 주구장창 쓰면서 레이아웃을 잡다가, flex를 사용하고 부터 그리드 잡는게 확연히 빨라지고, 간단해졌다.
+그것뿐만 아니라, 기존에 상하좌우 정렬에서도 맞출려면 삽질이 필요했던 적이 있었는데 이러한 부분에서 flex를 사용하면 더 간단하게 작업할 수 있었다.</p>
+
+<p>오늘은 flex에 대해서 알아보자</p>
+
+<h2 id="flex의-기본-구조">flex의 기본 구조</h2>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"container"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"item"</span><span class="nt">&gt;</span>helloflex<span class="nt">&lt;/div&gt;</span>
+	<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"item"</span><span class="nt">&gt;</span>abc<span class="nt">&lt;/div&gt;</span>
+	<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"item"</span><span class="nt">&gt;</span>helloflex<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+<p>부모 요소의 container를 flex container라고 부르고, 자식 요소인 item들을 flex item 이라고 부른다.
+컨테이너가 flex의 영향을 받는 전체 공간이고, 설정된 속성에 따라 각 아이템들이 배치되게 된다
+flex의 속성들은 컨테이너에 적용하는 속성과 아이템들에 적용되는 속성 두가지로 나누어지는데,</p>
+
+<p>우선 컨테이너에 적용되는 속성에 대해서 먼저 알아보자</p>
+
+<h2 id="flex에-적용되는-속성들">flex에 적용되는 속성들</h2>
+
+<h3 id="dispaly-flex">dispaly: flex;</h3>
+<p>우선 부모 컨테이너에 flex를 적용시켜보자.</p>
+
+<p><img src="/img/posts/22_01_02/beforeFlex.png" alt="flex" />
+flex를 적용시키기 전의 모습이다. 
+하지만 flex를 적용한다면?</p>
+
+<p><img src="/img/posts/22_01_02/afterFlex.png" alt="flex" />
+요로코롬 바뀐다.</p>
+
+<p>내용믈의 넓이만큼 각 item들이 공간을 차지하게 되는데, 기존의 div가 한 라인을 block하는 것에 비해 각자가 차지할 공간만큼 차지하게 되는 것이다.</p>
+
+<p>물론 이게 옆으로만 배치되는게 아니라, 배치 방향을 main axis 설정을 통해서 바꿀 수 있다. 
+기본적으로 수평 방향으로 배치이기 때문에 이렇게 보이는 것이다.</p>
+
+<h2 id="flex-direction">flex-direction</h2>
+<p>기본적으로 배치되는 수평 배치를 바꿀수도 있다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.container</span> <span class="p">{</span>
+	<span class="nl">flex-direction</span><span class="p">:</span> <span class="n">row</span><span class="p">;</span>
+	<span class="c">/* flex-direction: column; */</span>
+	<span class="c">/* flex-direction: row-reverse; */</span>
+	<span class="c">/* flex-direction: column-reverse; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>사용 가능한 값은 총 4가지인데,</p>
+<ul>
+  <li>기본적은 row</li>
+  <li>위에서 아래로 수직 배치인 column</li>
+  <li>오른쪽에서 왼쪽으로 배치되는 row-reverse</li>
+  <li>밑에서 위로 배치되는 column-reverse가 있다.</li>
+</ul>
+
+<h2 id="flex-warp">flex-warp</h2>
+<p>div를 가지고 놀다 보면 container 안의 내용물이 넘치는 경우가 있다.
+기존에서는 overflow 속성을 div에 부여해 이러한 것들을 관리했지만, flex에서는 flex-warp을 통해서 관리한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.container</span> <span class="p">{</span>
+	<span class="nl">flex-wrap</span><span class="p">:</span> <span class="nb">nowrap</span><span class="p">;</span>
+	<span class="c">/* flex-wrap: wrap; */</span>
+	<span class="c">/* flex-wrap: wrap-reverse; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<ul>
+  <li>넘치는 경우에 아무런 작업을 하지 않는 nowrap</li>
+  <li>넘치는 아이템에 대해서 줄바꿈을 하는 wrap</li>
+  <li>줄바꿈을 하긴 하는데 위쪽으로 배치하는 wrap-reverse</li>
+</ul>
+
+<h3 id="flex-flow">flex-flow</h3>
+<p>그리고 위의 모든 속성을 한번에 지정할 수 있는 단축 속성이다.</p>
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.container</span> <span class="p">{</span>
+	<span class="nl">flex-flow</span><span class="p">:</span> <span class="n">row</span> <span class="n">wrap</span><span class="p">;</span>
+	<span class="c">/* 아래의 두 줄을 줄여 쓴 것 */</span>
+	<span class="c">/* flex-direction: row; */</span>
+	<span class="c">/* flex-wrap: wrap; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="justify-content">justify-content</h3>
+<p>이제 메인축 방향으로 아이템들을 정렬하는 속성에 대해서 알아보자.</p>
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.container</span> <span class="p">{</span>
+	<span class="nl">justify-content</span><span class="p">:</span> <span class="n">flex-start</span><span class="p">;</span>
+	<span class="c">/* justify-content: flex-end; */</span>
+	<span class="c">/* justify-content: center; */</span>
+	<span class="c">/* justify-content: space-between; */</span>
+	<span class="c">/* justify-content: space-around; */</span>
+	<span class="c">/* justify-content: space-evenly; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<ul>
+  <li>flex-start는 시작 지점에서 배치된다. direction이 row일때는 왼쪽, column에서는 위에서부터가 시작점이 된다.</li>
+  <li>center는 아이템을 중앙에 정렬한다.</li>
+  <li>space-between은 아이템 사이에 균일한 간격을 만들어준다.</li>
+  <li>space-around는 아이템들의 둘레에 균일한 간격을 만들어준다.</li>
+  <li>space-evenly는 아이템들과 양 끝 사이에 균일한 간격을 만들어준다. 하지만 이 속성은 IE와 Edge 에서는 적용되지 않으니 유의하여야 한다.</li>
+</ul>
+
+<p>space관련 속성들은 비슷해보이는데, 좋은 예시 사진이 있어서 첨부한다.</p>
+
+<p><img src="/img/posts/22_01_02/space.jpg" alt="space" />
+<a href="https://studiomeal.com/wp-content/uploads/2020/01/10-1.jpg">출처</a></p>
+
+<h3 id="align-items">align-items</h3>
+<p>이제 수직축 방향으로 아이템을 정렬하는 속성을 알아보자.</p>
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.container</span> <span class="p">{</span>
+	<span class="nl">align-items</span><span class="p">:</span> <span class="n">stretch</span><span class="p">;</span>
+	<span class="c">/* align-items: flex-start; */</span>
+	<span class="c">/* align-items: flex-end; */</span>
+	<span class="c">/* align-items: center; */</span>
+	<span class="c">/* align-items: baseline; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<ul>
+  <li>stretch는 아이템을 수직축 방향으로 늘여서 꽉 차게 만든다.</li>
+  <li>flex-start는 아이템을 위쪽에 붙이고, 내부의 내용물만큼만 자리를 차지하게 만든다.</li>
+  <li>flex-end는 아이템을 밑쪽에 붙이고, 내부의 내용물만큼만 자리를 차지하게 만든다.</li>
+  <li>center는 아이템을 container의 중앙에 정렬한다.</li>
+  <li>baselin은 아이템들을 아이템 내부의 텍스트 베이스라인 기준으로 정렬하게 된다.</li>
+</ul>
+
+<h2 id="flex-아이템에-적용하는-속성들">flex 아이템에 적용하는 속성들</h2>
+
+<h3 id="flex-basis">flex-basis</h3>
+<p>이 속성은 flex아이템의 기본 크기를 설정한다. 
+direction이 row일때는 너비고, column일때는 높이가 된다.</p>
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.item</span> <span class="p">{</span>
+	<span class="nl">flex-basis</span><span class="p">:</span> <span class="nb">auto</span><span class="p">;</span> <span class="c">/* 기본값 */</span>
+	<span class="c">/* flex-basis: 0; */</span>
+	<span class="c">/* flex-basis: 50%; */</span>
+	<span class="c">/* flex-basis: 300px; */</span>
+	<span class="c">/* flex-basis: 10rem; */</span>
+	<span class="c">/* flex-basis: content; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>여러가지  값들을 넣을 수 있겠지만, 기본값 auto는 해당 아이템의 width값을 사용한다.</p>
+
+<h3 id="align-self">align-self</h3>
+<p>이 속성은 수직충 정렬인데, container에서 지정하는 align-items보다 우선권을 가지고 적용된다.
+전체 설정보다 각각의 개별 속서잉 우선된다는 것은 법칙이라고도 할 수 있겠다.</p>
+
+<p>세부 속성들을 알아보자.</p>
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.item</span> <span class="p">{</span>
+	<span class="nl">align-self</span><span class="p">:</span> <span class="nb">auto</span><span class="p">;</span>
+	<span class="c">/* align-self: stretch; */</span>
+	<span class="c">/* align-self: flex-start; */</span>
+	<span class="c">/* align-self: flex-end; */</span>
+	<span class="c">/* align-self: center; */</span>
+	<span class="c">/* align-self: baseline; */</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>각 속성들은 align-items들과 똑같다.</p>
+
+<h3 id="order">order</h3>
+<p>아이템들이 어떻게 배치될것인지 순서를 지정할 수 있다. 
+시각적으로 배치되는 순서가 바뀔 뿐이지, html 자체의 구조를 바꾸는 것이 아니기 때문에 접근성 측면이나 child-node를 인덱스를 가지고 접근할 때에는 적용되지 않는다는것을 유의하여야 한다.</p>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.item</span><span class="nd">:nth-child</span><span class="o">(</span><span class="err">1</span><span class="o">)</span> <span class="p">{</span> <span class="nl">order</span><span class="p">:</span> <span class="m">3</span><span class="p">;</span> <span class="p">}</span> <span class="c">/* A */</span>
+<span class="nc">.item</span><span class="nd">:nth-child</span><span class="o">(</span><span class="err">2</span><span class="o">)</span> <span class="p">{</span> <span class="nl">order</span><span class="p">:</span> <span class="m">1</span><span class="p">;</span> <span class="p">}</span> <span class="c">/* B */</span>
+<span class="nc">.item</span><span class="nd">:nth-child</span><span class="o">(</span><span class="err">3</span><span class="o">)</span> <span class="p">{</span> <span class="nl">order</span><span class="p">:</span> <span class="m">2</span><span class="p">;</span> <span class="p">}</span> <span class="c">/* C */</span>
+</code></pre></div></div>
+
+<h1 id="정리">정리</h1>
+<p>flex를 사용하면 기존 div를 가지고 1px단위까지 맞춰서 빡빡하게 레이아웃을 짜던 것에 비해 조금 더 자유롭게 개발 할 수 있는 것 같다.
+그래도…..프론트는 싫다 진짜…</p>
+:ET

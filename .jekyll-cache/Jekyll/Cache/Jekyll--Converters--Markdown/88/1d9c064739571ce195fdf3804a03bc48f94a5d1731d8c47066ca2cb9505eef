@@ -1,0 +1,258 @@
+I"�n<p>타입스크립트에서 지원하는 유틸리티 타입에 대해서 정리해보았다.
+한번 정리 해놓고 계속 활용할 수 있었으면 좋겠다.</p>
+
+<p>대부분의 예제와 텍스트들은 해당 링크를 참조하였다 <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html">링크</a></p>
+
+<h3 id="recordk-t">Record&lt;K, T&gt;</h3>
+<p>프로퍼키 키가 k이고 프로퍼티 값이 T 형식인 객체의 형식을 정의한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">CatInfo</span> <span class="p">{</span>
+  <span class="nl">age</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">breed</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">type</span> <span class="nx">CatName</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">miffy</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">boris</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">mordred</span><span class="dl">"</span><span class="p">;</span>
+ 
+<span class="kd">const</span> <span class="nx">cats</span><span class="p">:</span> <span class="nb">Record</span><span class="o">&lt;</span><span class="nx">CatName</span><span class="p">,</span> <span class="nx">CatInfo</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">miffy</span><span class="p">:</span> <span class="p">{</span> <span class="na">age</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="na">breed</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Persian</span><span class="dl">"</span> <span class="p">},</span>
+  <span class="na">boris</span><span class="p">:</span> <span class="p">{</span> <span class="na">age</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">breed</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Maine Coon</span><span class="dl">"</span> <span class="p">},</span>
+  <span class="na">mordred</span><span class="p">:</span> <span class="p">{</span> <span class="na">age</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="na">breed</span><span class="p">:</span> <span class="dl">"</span><span class="s2">British Shorthair</span><span class="dl">"</span> <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>이 유틸리티를 가장 많이 본 경우는, Request 등 에서 하부 프로퍼티로 객체를 가지는 경우에 형태를 정의하기 위함이였다.</p>
+
+<p>예를 들어,</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nb">Record</span><span class="o">&lt;</span><span class="nx">sting</span><span class="p">,</span> <span class="kr">any</span><span class="o">&gt;</span> <span class="c1">// is strict way of decare {}</span>
+
+<span class="kd">const</span> <span class="nx">example</span><span class="p">:</span> <span class="nb">Record</span><span class="o">&lt;</span><span class="nx">CatName</span><span class="p">,</span> <span class="nx">CatInfo</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">aa Text</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// Record&lt;string, string&gt;</span>
+  <span class="dl">"</span><span class="s2">bb</span><span class="dl">"</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span> <span class="c1">// Record&lt;string, number&gt;</span>
+  <span class="dl">"</span><span class="s2">cc</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span> <span class="dl">"</span><span class="s2">dd</span><span class="dl">"</span> <span class="p">:</span> <span class="dl">"</span><span class="s2">dd Text</span><span class="dl">"</span> <span class="p">},</span> <span class="c1">// Record&lt;string, any&gt;, and // Record&lt;string, string&gt;</span>
+  <span class="dl">"</span><span class="s2">ee</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span> <span class="c1">// Record&lt;string, any&gt;</span>
+	  <span class="dl">"</span><span class="s2">ff</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">ff Text</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// Record&lt;string, string&gt;</span>
+	  <span class="dl">"</span><span class="s2">gg</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">gg Text</span><span class="dl">"</span> <span class="c1">// Record&lt;string, string&gt;</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>와 같은 형태로 사용할 수 있게 된다.</p>
+
+<p>이게 {} 와 무엇이 다른가 라고 한다면, 해당 <a href="https://stackoverflow.com/questions/60996831/differences-between-recordstring-any-and">링크</a>의 글을 참조해 보면</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">a</span><span class="p">:{}</span> <span class="o">=</span> <span class="p">{</span><span class="dl">"</span><span class="s2">aa</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">a text</span><span class="dl">"</span><span class="p">}</span> 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="c1">// {"aa": "a text"}</span>
+
+<span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span> <span class="c1">// </span>
+</code></pre></div></div>
+
+<p>a 는 json 형태로 잡고 싶은데 1을 넣어도 에러가 발생하지 않는다!</p>
+
+<p>문제가 생길 냄새가 스멀스멀 올라온다.
+이러한 이유 때문에 Record&lt;string, any&gt;와 같은 형태로 사용하게 되는 것이ㅏㄷ.</p>
+
+<h3 id="excludet-u">Exclude&lt;T, U&gt;</h3>
+<p>Exclude 타입은 2개의 제네릭 타입을 받을 수 있으며,
+첫번째 제네릭 타입 T 중 두번째 제네릭 타입 U와 겹치는 타입을 제외한 타입을 반환한다.</p>
+
+<p>타입 T가 타입 U를 상속하거나 동일 타입이라면 무시(never)하고 아닐 경우 타입 값을 리턴한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">T0</span> <span class="o">=</span> <span class="nx">Exclude</span><span class="o">&lt;</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T0 = "b" | "c"</span>
+     
+
+<span class="kd">type</span> <span class="nx">T1</span> <span class="o">=</span> <span class="nx">Exclude</span><span class="o">&lt;</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T1 = "c"</span>
+     
+
+<span class="kd">type</span> <span class="nx">T2</span> <span class="o">=</span> <span class="nx">Exclude</span><span class="o">&lt;</span><span class="kr">string</span> <span class="o">|</span> <span class="kr">number</span> <span class="o">|</span> <span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">),</span> <span class="nb">Function</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T2 = string | number</span>
+</code></pre></div></div>
+
+<p>다시 말해 두번째 제네릭 타입 U에 대해
+첫번째 제네릭 타입 T가 할당 가능한 타입인지를 판단하고,
+할당 가능한 타입을 제외한 나머지 타입들을 이용하여 타입을 정의한다.</p>
+
+<h3 id="extractt-u">Extract&lt;T, U&gt;</h3>
+<p>Exclude와 반대되는 개념이다. T 타입에서 U 타입과 겹치는 타입만을 추출한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">T0</span> <span class="o">=</span> <span class="nx">Extract</span><span class="o">&lt;</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T0 = "a"</span>
+
+<span class="kd">type</span> <span class="nx">T1</span> <span class="o">=</span> <span class="nx">Extract</span><span class="o">&lt;</span><span class="kr">string</span> <span class="o">|</span> <span class="kr">number</span> <span class="o">|</span> <span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">),</span> <span class="nb">Function</span><span class="o">&gt;</span><span class="p">;</span>  <span class="c1">// type T1 = () =&gt; void</span>
+</code></pre></div></div>
+
+<p>Exclude 타입과는 다르게 유니온 타입 Event와 Point에 대하여 Point 할당 타입을 반환하기 때문에 PointInfo 타입은 Point 타입과 같아진다. 내가 원하는 프로퍼티로 구성된 타입이 이미 있을 때 사용할 수 있을거 같다.</p>
+
+<h3 id="pickt-k">Pick&lt;T, K&gt;</h3>
+<p>T 타입으로부터 K 프로퍼티만 추출한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nb">Pick</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">K</span> <span class="kd">extends</span> <span class="kr">keyof</span> <span class="nx">T</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nx">P</span> <span class="k">in</span> <span class="nx">K</span><span class="p">]:</span> <span class="nx">T</span><span class="p">[</span><span class="nx">P</span><span class="p">];</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>주어진 첫번째 제네릭 타입 T 내에서 Union 타입 K라는 프로퍼티에 대한 타입들을 뽑아낸다.
+필요한 타입만 추출해서 원하는 타입을 만들 수 있다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Todo</span> <span class="p">{</span>
+  <span class="nl">title</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">description</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">completed</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">type</span> <span class="nx">TodoPreview</span> <span class="o">=</span> <span class="nb">Pick</span><span class="o">&lt;</span><span class="nx">Todo</span><span class="p">,</span> <span class="dl">"</span><span class="s2">title</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">completed</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span>
+ 
+<span class="kd">const</span> <span class="nx">todo</span><span class="p">:</span> <span class="nx">TodoPreview</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">title</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Clean room</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">completed</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+<span class="p">};</span>
+ 
+</code></pre></div></div>
+
+<h3 id="partial">Partial<T></T></h3>
+<p>Partial은 제네릭 타입 T에 대해서 모든 프로퍼티들을 Optional하게 변경한다.</p>
+
+<p>제네릭 타입의 프로퍼티들에 대해 기존의 타입은 유지하되, 각각의 프로퍼티들을 Optional 타입으로 변경해준다. 필수 타입과 Optional 타입을 구분해서 사용해야 하는 경우 아래와 같이 쓸 수 있다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Todo</span> <span class="p">{</span>
+  <span class="nl">title</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">description</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">function</span> <span class="nx">updateTodo</span><span class="p">(</span><span class="nx">todo</span><span class="p">:</span> <span class="nx">Todo</span><span class="p">,</span> <span class="nx">fieldsToUpdate</span><span class="p">:</span> <span class="nb">Partial</span><span class="o">&lt;</span><span class="nx">Todo</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="p">...</span><span class="nx">todo</span><span class="p">,</span> <span class="p">...</span><span class="nx">fieldsToUpdate</span> <span class="p">};</span>
+<span class="p">}</span>
+ 
+<span class="kd">const</span> <span class="nx">todo1</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">title</span><span class="p">:</span> <span class="dl">"</span><span class="s2">organize desk</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">description</span><span class="p">:</span> <span class="dl">"</span><span class="s2">clear clutter</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">};</span>
+ 
+<span class="kd">const</span> <span class="nx">todo2</span> <span class="o">=</span> <span class="nx">updateTodo</span><span class="p">(</span><span class="nx">todo1</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">description</span><span class="p">:</span> <span class="dl">"</span><span class="s2">throw out trash</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">todo2</span><span class="p">)</span> <span class="c1">// { "title": "organize desk", "description": "throw out trash" } </span>
+</code></pre></div></div>
+
+<h3 id="required">Required<T></T></h3>
+<p>Required는 위의 Partial과 반대되는 개념이다. 제네릭 타입 T의 모든 프로퍼티에 대해 Required 속성으로 만들어준다.</p>
+
+<p>마이너스 연산자는 Optional을 제거해준다는 의미의 연산자이다.
+Partial 타입과 동일하게 기존의 타입은 유지된 상태에서 Required 타입으로 변경된다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Props</span> <span class="p">{</span>
+  <span class="nl">a</span><span class="p">?:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">b</span><span class="p">?:</span> <span class="kr">string</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">const</span> <span class="nx">obj</span><span class="p">:</span> <span class="nx">Props</span> <span class="o">=</span> <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">5</span> <span class="p">};</span>
+ 
+<span class="kd">const</span> <span class="nx">obj2</span><span class="p">:</span> <span class="nx">Required</span><span class="o">&lt;</span><span class="nx">Props</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">5</span> <span class="p">};</span> <span class="c1">// Error: Property 'b' is missing in type '{ a: number; }' but required in type 'Required&lt;Props&gt;'.</span>
+</code></pre></div></div>
+
+<h3 id="readonly">ReadOnly<T></T></h3>
+<p>T의 모든 프로퍼티를 읽기 전용(readOnly)으로 설정한 타입을 구성한다. 즉 모든 프로퍼티의 값을 변경할 수 없고 참조만 할 수 있도록 만든다.</p>
+
+<p>ReadOnly로 생성된 타입에 값을 재할당하려고 하면 에러가 난다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">eventState</span> <span class="p">{</span>
+  <span class="nl">title</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">id</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">event</span><span class="p">:</span> <span class="nx">ReadOnly</span><span class="o">&lt;</span><span class="nx">eventState</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">title</span><span class="p">:</span> <span class="dl">'</span><span class="s1">new event</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="nx">event</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Hello</span><span class="dl">'</span><span class="p">;</span> <span class="c1">// 에러 발생!</span>
+</code></pre></div></div>
+
+<h3 id="omitt-k">Omit&lt;T, K&gt;</h3>
+<p>Omit 타입은 두개의 제네릭 타입을 받으며 T에서 모든 프로퍼티를 선택한 다음 K를 제거한 타입을 구성한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Todo</span> <span class="p">{</span>
+  <span class="nl">title</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">description</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">completed</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">;</span>
+  <span class="nl">createdAt</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">type</span> <span class="nx">TodoPreview</span> <span class="o">=</span> <span class="nx">Omit</span><span class="o">&lt;</span><span class="nx">Todo</span><span class="p">,</span> <span class="dl">"</span><span class="s2">description</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span>
+ 
+<span class="kd">const</span> <span class="nx">todo</span><span class="p">:</span> <span class="nx">TodoPreview</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">title</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Clean room</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">completed</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="na">createdAt</span><span class="p">:</span> <span class="mi">1615544252770</span><span class="p">,</span>
+<span class="p">};</span>
+ 
+ 
+<span class="kd">type</span> <span class="nx">TodoInfo</span> <span class="o">=</span> <span class="nx">Omit</span><span class="o">&lt;</span><span class="nx">Todo</span><span class="p">,</span> <span class="dl">"</span><span class="s2">completed</span><span class="dl">"</span> <span class="o">|</span> <span class="dl">"</span><span class="s2">createdAt</span><span class="dl">"</span><span class="o">&gt;</span><span class="p">;</span>
+ 
+<span class="kd">const</span> <span class="nx">todoInfo</span><span class="p">:</span> <span class="nx">TodoInfo</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">title</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Pick up kids</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">description</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Kindergarten closes at 5pm</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">};</span>
+ 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">todoInfo</span><span class="p">);</span> <span class="c1">// {</span>
+<span class="c1">//  "title": "Pick up kids",</span>
+<span class="c1">//  "description": "Kindergarten closes at 5pm"</span>
+<span class="c1">//} </span>
+</code></pre></div></div>
+
+<p>보다보니까 Exclude와 다른점이 뭘까라는 생각이 들었는데, Exclude는 두번째 제네릭 타입에 타입이 들어가고 Omit은 키값으로 넣어준다는 게 차이점인 것 같다.
+Exclude&lt;T, U&gt; : T에서 U에 할당할 수 있는 타입을 제외한 타입 반환
+Omit&lt;T, U&gt; : T의 모든 프로퍼티 중 U가 제거된 프로퍼티들의 타입 반환</p>
+
+<h3 id="nonnullable">NonNullable<T></T></h3>
+<p>주어진 제네릭 타입 T에서 null과 undefined를 제외한 타입을 구성한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">T0</span> <span class="o">=</span> <span class="nx">NonNullable</span><span class="o">&lt;</span><span class="kr">string</span> <span class="o">|</span> <span class="kr">number</span> <span class="o">|</span> <span class="kc">undefined</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T0 = string | number</span>
+<span class="kd">type</span> <span class="nx">T1</span> <span class="o">=</span> <span class="nx">NonNullable</span><span class="o">&lt;</span><span class="kr">string</span><span class="p">[]</span> <span class="o">|</span> <span class="kc">null</span> <span class="o">|</span> <span class="kc">undefined</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T1 = string[]</span>
+</code></pre></div></div>
+
+<h3 id="returntype">ReturnType<T></T></h3>
+
+<p>ReturnType 타입은 주어진 제네릭 타입 T의 return type을 할당한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">declare</span> <span class="kd">function</span> <span class="nx">f1</span><span class="p">():</span> <span class="p">{</span> <span class="nl">a</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">b</span><span class="p">:</span> <span class="kr">string</span> <span class="p">};</span>
+ 
+<span class="kd">type</span> <span class="nx">T0</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="kr">string</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T0 = string</span>
+     
+
+<span class="kd">type</span> <span class="nx">T1</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="p">(</span><span class="nx">s</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T1 = void</span>
+     
+
+<span class="kd">type</span> <span class="nx">T2</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T2 = unknown</span>
+     
+
+<span class="kd">type</span> <span class="nx">T3</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;&lt;</span><span class="nx">T</span> <span class="kd">extends</span> <span class="nx">U</span><span class="p">,</span> <span class="nx">U</span> <span class="kd">extends</span> <span class="kr">number</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T3 = number[]</span>
+     
+
+<span class="kd">type</span> <span class="nx">T4</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">f1</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T4 = { a: number; b: string; }</span>
+     
+
+<span class="kd">type</span> <span class="nx">T5</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="kr">any</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T5 = any</span>
+     
+
+<span class="kd">type</span> <span class="nx">T6</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="nx">never</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// type T6 = never</span>
+     
+
+<span class="kd">type</span> <span class="nx">T7</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="kr">string</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="s2">`
+Type 'string' does not satisfy the constraint '(...args: any) =&gt; any'.
+`</span>    
+
+
+<span class="kd">type</span> <span class="nx">T8</span> <span class="o">=</span> <span class="nx">ReturnType</span><span class="o">&lt;</span><span class="nb">Function</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="s2">`
+Type 'Function' does not satisfy the constraint '(...args: any) =&gt; any'.
+  Type 'Function' provides no match for the signature '(...args: any): any'.
+`</span>    
+
+</code></pre></div></div>
+
+<p>이 이외에도 Uppercase, Lowercase, Capitalize, Uncapitalize 등의 유틸리티도 있지만 이는 따로 정리하지 않았다.</p>
+
+<p>앞으로도 이러한 유틸리티로 정의된 입력 형식과 출력형식에서 안쫄아도 되겠다는 생각이 들고, 앞으로도 안쫄았으면 좋겠다…</p>
+:ET
